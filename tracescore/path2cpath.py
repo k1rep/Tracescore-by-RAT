@@ -1,7 +1,8 @@
 import sqlite3
 
 def path2cpath(path):
-    conn = sqlite3.connect(path.replace('2', '1'))
+    new_path = path[::-1].replace('2', '1', 1)[::-1]
+    conn = sqlite3.connect(new_path)
     cur = conn.cursor()
     cur.execute(""" select * from Mapping; """)
     cpath_2_id = {it[0]: it[1] for it in cur.fetchall()}

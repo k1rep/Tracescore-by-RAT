@@ -65,7 +65,9 @@ def calculate(issues, filePath):
 path = "../data/tracescore"
 files = os.listdir(path)
 
-files = ["teiid", "Weld", "infinispan", "Wildfly", "derby", "hornetq"]
+# 1-mapping 2-issue
+# files = ["teiid2", "Weld2", "infinispan2", "Wildfly2", "derby2", "hornetq2", "izpack2", "seam22", "railo2", "log4j22"]
+files = ["drools2", "keycloak2"]
 
 print(";MAP;MRR;Top 1;Top 5;Top 10")
 for file in files[:]:

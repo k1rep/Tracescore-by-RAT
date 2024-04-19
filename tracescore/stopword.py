@@ -32,36 +32,37 @@ def text_preprocessing(texts):
         result.append(text)
     return result
 
+if __name__ == "__main__":
+    path = "../data/tracescore"
+    # 1是RAT的结果，2是爬取的结果
+    #files = ["teiid2", "Weld2", "WildFlyCore2", "WildFlyElytron2", "WildFly2","Undertow2", "RestEasy2", "ModeShape2", "JGroups2", "JBossTransactionManager2", "infinispan2", "HAL2", "Debezium2"]
+    # files = ["teiid2", "Weld2", "infinispan2", "Wildfly2", "derby2", "hornetq2", "izpack2", "seam22", "railo2", "log4j22"]
+    files = ["drools2", "keycloak2"]
+    for file in files[:]:
+        print(file, end=" ")
+        filePath = path + "/" + file + ".sqlite3"
+        connection = sqlite3.connect(filePath)
+        connection.text_factory = str
+        cursor = connection.cursor()
+        cursor.execute("select issue_id, summary_stemmed, description_stemmed from issue")
+        result = cursor.fetchall()
+        ids = [tmp[0] for tmp in result]
+        summary = [tmp[1] for tmp in result]
+        description = [tmp[2] for tmp in result]
+        summary_stem = text_preprocessing(summary)
+        description_stem = text_preprocessing(description)
 
-path = "../data/tracescore"
-# 1是RAT的结果，2是爬取的结果
-#files = ["teiid2", "Weld2", "WildFlyCore2", "WildFlyElytron2", "WildFly2","Undertow2", "RestEasy2", "ModeShape2", "JGroups2", "JBossTransactionManager2", "infinispan2", "HAL2", "Debezium2"]
-files = ["Wildfly2"]
-for file in files[:]:
-    print(file, end=" ")
-    filePath = path+"/"+file + ".sqlite3"
-    connection = sqlite3.connect(filePath)
-    connection.text_factory = str
-    cursor = connection.cursor()
-    cursor.execute("select issue_id, summary_stemmed, description_stemmed from issue")
-    result = cursor.fetchall()
-    ids = [tmp[0] for tmp in result]
-    summary = [tmp[1] for tmp in result]
-    description = [tmp[2] for tmp in result]
-    summary_stem = text_preprocessing(summary)
-    description_stem = text_preprocessing(description)
 
+        data = []
+        for i in range(len(ids)):
+            x = [summary_stem[i], description_stem[i], ids[i]]
+            data.append(x)
 
-    data = []
-    for i in range(len(ids)):
-        x = [summary_stem[i], description_stem[i], ids[i]]
-        data.append(x)
-
-    cursor = connection.cursor()
-    # cursor.execute("alter table issue add column summary_stem text")
-    # cursor.execute("alter table issue add column description_stem text")
-    cursor.executemany("update issue set summary_stemmed = ?, description_stemmed = ? where issue_id = ?", data)
-    connection.commit()
-    cursor.close()
-    connection.close()
-    print()
+        cursor = connection.cursor()
+        # cursor.execute("alter table issue add column summary_stem text")
+        # cursor.execute("alter table issue add column description_stem text")
+        cursor.executemany("update issue set summary_stemmed = ?, description_stemmed = ? where issue_id = ?", data)
+        connection.commit()
+        cursor.close()
+        connection.close()
+        print()
